@@ -30,13 +30,45 @@ document.querySelector('.promo__bg').style.background = "url('img/bg.jpg')";
 
 const movieList = document.querySelector('.promo__interactive-list');
 
-movieList.innerHTML = '';
-movieDB.movies.sort();
+function createMovieList() {
+    movieList.innerHTML = '';
+    movieDB.movies.sort();
 
-movieDB.movies.forEach((item, i) => {
-    movieList.innerHTML += `
-        <li class="promo__interactive-item">${i + 1} ${item}
-            <div class="delete"></div>
-        </li>
-    `;
+    movieDB.movies.forEach((item, i) => {
+        if (item.length > 21) {
+            item = item.slice(0, 21) +'...';
+        }
+
+        movieList.innerHTML += `
+            <li class="promo__interactive-item">${i + 1} ${item}
+                <div class="delete"></div>
+            </li>
+        `;
+    });
+    movieList.querySelectorAll('.delete').forEach((item,i) => {
+        item.addEventListener('click', () => {
+            item.parentElement.remove();
+            movieDB.movies.splice(i, 1);
+            createMovieList();
+        });
+    });
+}
+createMovieList();
+
+const formInput = document.querySelector('form.add');
+
+formInput.querySelector('button').addEventListener('click', (event) => {
+    event.preventDefault();
+    while (formInput.querySelector('.adding__input').value != ''){
+        movieDB.movies.push(formInput.querySelector('.adding__input').value);
+        formInput.querySelector('.adding__input').value = '';
+        if (formInput.querySelector('.yes').previousElementSibling.checked) {
+            alert('Добавляем любимый фильм');
+            formInput.querySelector('.yes').previousElementSibling.checked = false;
+        }
+        createMovieList();
+    }
 });
+
+
+
